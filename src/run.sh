@@ -1,3 +1,4 @@
+#!/bin/bash
 export CUDA_VISIBLE_DEVICES=0
 export IMG_HEIGHT=137
 export IMG_WIDTH=236
@@ -10,22 +11,19 @@ export BASE_MODEL="resnet34"
 
 export TRAINING_FOLDS_CSV="/root/input/train_folds.csv"
 
-export TRAINING_FOLDS="(0, 1, 2, 3)"
-export VALIDATION_FOLDS="(4,)"
+declare -a val
+for i in 0 1 2 3 4
+do
+for TESTING_FOLDS in 0 1 2 3 4
+do
+if [[ $TESTING_FOLDS != $i ]]
+then
+val+=$TESTING_FOLDS
+else
+export TESTING_FOLDS=$TESTING_FOLDS
+fi
+done
+export TRAINING_FOLDS=${val[*]}
 python3 train.py
-
-export TRAINING_FOLDS="(0, 1, 2, 4)"
-export VALIDATION_FOLDS="(3,)"
-python3 train.py
-
-export TRAINING_FOLDS="(0, 1, 4, 3)"
-export VALIDATION_FOLDS="(2,)"
-python3 train.py
-
-export TRAINING_FOLDS="(0, 4, 2, 3)"
-export VALIDATION_FOLDS="(1,)"
-python3 train.py
-
-export TRAINING_FOLDS="(4, 1, 2, 3)"
-export VALIDATION_FOLDS="(0,)"
-python3 train.py
+val=()
+done
